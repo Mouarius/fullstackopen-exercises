@@ -3,7 +3,7 @@ const app = express()
 
 app.use(express.json())
 
-const persons = [
+let persons = [
     {
         name: "Arto Hellas",
         number: "040-123456",
@@ -23,6 +23,11 @@ const persons = [
         name: "Mary Poppendieck",
         number: "39-23-6423122",
         id: 4
+    },
+    {
+        name: "Alice Capdemourlin",
+        number: "33-23-6423122",
+        id: 5
     }
 ]
 
@@ -41,13 +46,30 @@ app.get(`/info`, (req, res) => {
 })
 
 app.get(`/api/persons/:id`, (req, res) => {
-    const idParam = Number(req.params.id)
-    const person = persons.find(person => person.id === idParam)
+    const id = Number(req.params.id)
+    const person = persons.find(person => person.id === id)
     if(person){
         res.status(200).json(person)
     } else {
         res.status(404).end()
     }
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    persons = persons.filter(person => person.id !== id)
+    res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+    const id = Math.floor(Math.random()*10000)
+    const person = req.body
+    console.log('person :>> ', person);
+    person.id = id
+    console.log('person :>> ', person);
+    persons = persons.concat(person)
+    console.log('persons :>> ', persons);
+    res.status(201).json(person)
 })
 
 const PORT = 3001
