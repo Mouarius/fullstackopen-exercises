@@ -40,6 +40,16 @@ app.get(`/info`, (req, res) => {
     res.status(200).send(`Phonebook has info for ${persons.length} people <br/><br/> ${reqDate.toUTCString()}`)
 })
 
+app.get(`/api/persons/:id`, (req, res) => {
+    const idParam = Number(req.params.id)
+    const person = persons.find(person => person.id === idParam)
+    if(person){
+        res.status(200).json(person)
+    } else {
+        res.status(404).end()
+    }
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}/`)
