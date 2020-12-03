@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
     res.send("App is working")
 })
 
-app.get('/api/persons', (req, res) =>{
+app.get('/api/persons', (req, res) => {
     res.status(200).json(persons)
 })
 
@@ -48,7 +48,7 @@ app.get(`/info`, (req, res) => {
 app.get(`/api/persons/:id`, (req, res) => {
     const id = Number(req.params.id)
     const person = persons.find(person => person.id === id)
-    if(person){
+    if (person) {
         res.status(200).json(person)
     } else {
         res.status(404).end()
@@ -62,14 +62,25 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-    const id = Math.floor(Math.random()*10000)
+    const id = Math.floor(Math.random() * 10000)
     const person = req.body
     console.log('person :>> ', person);
-    person.id = id
-    console.log('person :>> ', person);
-    persons = persons.concat(person)
-    console.log('persons :>> ', persons);
-    res.status(201).json(person)
+    if (person.number) {
+        if (person.name) {
+            if (persons.find(p => p.name.toLowerCase() === person.name.toLowerCase())) {
+                res.status(409).json({ error: `The name must be unique.` })
+            } else {
+                person.id = id
+                console.log('person :>> ', person);
+                persons = persons.concat(person)
+                res.status(201).json(persons)
+            }
+        } else {
+            res.status(400).json({error: 'No name has been given.'})
+        }
+    } else {
+        res.status(400).json({error: 'No number has been given.'})
+    }
 })
 
 const PORT = 3001
