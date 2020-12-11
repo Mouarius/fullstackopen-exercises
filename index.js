@@ -5,6 +5,8 @@ const cors = require('cors')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
+const updateOptions = {new: true, runValidators: true}
+
 morgan.token('content', (req) => {
 	return JSON.stringify(req.body)
 })
@@ -19,7 +21,7 @@ app.use(express.json())
 app.get(`/info`, (req, res) => {
 	const reqDate = new Date()
 	Person.find({}).then((persons) => {
-		res.status(200).send(`Phonebook has info for ${persons.length} people <br/><br/> ${reqDate.toUTCString()}`)
+		res.status(200).send(`<p>Phonebook has info for ${persons.length} people <br/><br/> ${reqDate.toUTCString()}</p>`)
 	})
 })
 
@@ -34,6 +36,7 @@ app.get(`/api/persons/:id`, (req, res, next) => {
 	Person.findById(id)
 		.then((person) => {
 			if (person) {
+				console.log(typeof person)
 				res.status(200).json(person)
 			} else {
 				res.status(404).end()
@@ -51,63 +54,46 @@ app.delete('/api/persons/:id', (req, res) => {
 	})
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
 	const body = req.body
-	Person.find({}).then((persons) => {
-		console.log('body :>> ', body)
-		console.log('persons :>> ', persons)
-		if (body.number) {
-			if (body.name) {
-				if (persons.find((p) => p.name.toLowerCase() === body.name.toLowerCase())) {
-					res.status(409).json({ error: `The name must be unique.` })
-				} else {
-					var person = new Person({
-						name: body.name,
-						number: body.number,
-					})
-					person
-						.save()
-						.then((savedPerson) => {
-							res.status(201).json(savedPerson.toJSON())
-						})
-						.catch((error) => {
-							res.status(400).json({ error: error })
-						})
-				}
-			} else {
-				res.status(400).json({ error: 'No name has been given.' })
-			}
-		} else {
-			res.status(400).json({ error: 'No number has been given.' })
-		}
-	})
+	Person.find({})
+		.then((persons) => {
+			var person = new Person({
+				name: body.name,
+				number: body.number,
+			})
+			person
+				.save()
+				.then((savedPerson) => res.status(201).json(savedPerson))
+				.catch((err) => next(err))
+		})
+		.catch((err) => next(err))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
 	const id = req.params.id
 	const body = req.body
-	console.log('body :>> ', body);
-	Person.findByIdAndUpdate(id, body, { new: true })
+	Person.findByIdAndUpdate(id, body, updateOptions)
 		.then((updatedNote) => {
-
 			res.status(200).json(updatedNote)
 		})
 		.catch((err) => next(err))
 })
 
 const unknownEndpoint = (request, response) => {
-	response.status(404).send({ error: 'unknown endpoint' })
+	response.status(404).json({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-	console.error(error.message)
 
-	if (error.name === 'CastError' && error.kind == 'ObjectId') {
-		return response.status(400).send({ error: 'malformatted id' })
+	if (error.name === 'CastError' && error.kind === 'ObjectId') {
+		return response.status(400).json({ error: 'malformatted id' })
 	}
-
+	if (error.name === 'ValidationError'){
+		return response.status(400).json({error : error.message})
+	}
 	next(error)
 }
 
