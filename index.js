@@ -1,4 +1,6 @@
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') {
+	require('dotenv').config()
+}
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -14,7 +16,6 @@ morgan.token('content', (req) => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 app.use(cors())
-
 app.use(express.static('build'))
 app.use(express.json())
 
@@ -107,24 +108,24 @@ const errorHandler = (error, request, response, next) => {
 		if (nameError) {
 			if (nameError.kind === 'unique') {
 				// console.log('name unique')
-				errorMessage.push({error: 'property must be unique'})
+				errorMessage.push({ error: 'property must be unique' })
 			}
 			if (nameError.kind === 'required') {
 				// console.log('name required')
-				errorMessage.push({error: 'property is required'})
+				errorMessage.push({ error: 'property is required' })
 			}
 		}
 		if (numberError) {
 			if (numberError.kind === 'unique') {
 				// console.log('number unique')
-				errorMessage.push({error: 'property must be unique'})
+				errorMessage.push({ error: 'property must be unique' })
 			}
 			if (numberError.kind === 'required') {
 				// console.log('number required')
-				errorMessage.push({error: 'property is required'})
+				errorMessage.push({ error: 'property is required' })
 			}
 		}
-		console.log('errorMessage :>> ', errorMessage);
+		console.log('errorMessage :>> ', errorMessage)
 		return response.status(400).json(errorMessage)
 	}
 	next(error)
