@@ -5,7 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
-const updateOptions = {new: true, runValidators: true}
+const updateOptions = { new: true, runValidators: true, context: 'query' }
 
 morgan.token('content', (req) => {
 	return JSON.stringify(req.body)
@@ -87,12 +87,45 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-
+	//console.log('error.stack :>> ', error.stack);
+	console.log(error.toString())
+	//console.log('request :>> ', request);
+	//console.log('response :>> ', response);
+	//console.log('error.response.data :>> ', error.response.data);
 	if (error.name === 'CastError' && error.kind === 'ObjectId') {
 		return response.status(400).json({ error: 'malformatted id' })
 	}
-	if (error.name === 'ValidationError'){
-		return response.status(400).json({error : error.message})
+	if (error.name === 'ValidationError') {
+		var nameError = error.errors.name
+		var numberError = error.errors.number
+
+		var errorMessage = new Array()
+		// console.log('nameError :>> ', nameError)
+		// console.log('nameError.kind :>> ', nameError.kind)
+		// console.log('numberError :>> ', numberError);
+		// console.log('numberError.kind :>> ', numberError.kind);
+		if (nameError) {
+			if (nameError.kind === 'unique') {
+				// console.log('name unique')
+				errorMessage.push({error: 'property must be unique'})
+			}
+			if (nameError.kind === 'required') {
+				// console.log('name required')
+				errorMessage.push({error: 'property is required'})
+			}
+		}
+		if (numberError) {
+			if (numberError.kind === 'unique') {
+				// console.log('number unique')
+				errorMessage.push({error: 'property must be unique'})
+			}
+			if (numberError.kind === 'required') {
+				// console.log('number required')
+				errorMessage.push({error: 'property is required'})
+			}
+		}
+		console.log('errorMessage :>> ', errorMessage);
+		return response.status(400).json(errorMessage)
 	}
 	next(error)
 }
