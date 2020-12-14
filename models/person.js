@@ -2,9 +2,6 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 const url = process.env.MONGODB_URI
-const opts = {runValidators: true}
-
-//console.log(`connecting to : `, url)
 
 mongoose
 	.connect(url, {
