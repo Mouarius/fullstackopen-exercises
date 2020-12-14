@@ -13,7 +13,11 @@ morgan.token('content', (req) => {
   return JSON.stringify(req.body)
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
+app.use(
+  morgan(
+    ':method :url :status :res[content-length] - :response-time ms :content'
+  )
+)
 
 app.use(cors())
 app.use(express.static('build'))
@@ -22,7 +26,13 @@ app.use(express.json())
 app.get('/info', (req, res) => {
   const reqDate = new Date()
   Person.find({}).then((persons) => {
-    res.status(200).send(`<p>Phonebook has info for ${persons.length} people <br/><br/> ${reqDate.toUTCString()}</p>`)
+    res
+      .status(200)
+      .send(
+        `<p>Phonebook has info for ${
+          persons.length
+        } people <br/><br/> ${reqDate.toUTCString()}</p>`
+      )
   })
 })
 
