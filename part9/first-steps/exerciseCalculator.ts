@@ -22,7 +22,7 @@ const calculateExercises = (
   const average = sum / hours.length;
   const trainingDays = hours.filter((hour) => hour != 0).length;
   const ratio = average / target;
-  let rating: number;
+  let rating: number = 0;
 
   if (ratio < 1) rating = 1;
   else if (ratio === 1) rating = 2;
