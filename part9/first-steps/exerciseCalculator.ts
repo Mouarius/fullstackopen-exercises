@@ -1,4 +1,4 @@
-interface calculateResult {
+interface CalculateResult {
   periodLength: number;
   trainingDays: number;
   success: boolean;
@@ -8,10 +8,10 @@ interface calculateResult {
   average: number;
 }
 
-const calculateExercises = (
+export const calculateExercises = (
   hours: Array<number>,
   target: number
-): calculateResult => {
+): CalculateResult => {
   if (hours.length === 0) {
     throw new Error("You provided an empty array for the period!");
   }
@@ -22,11 +22,11 @@ const calculateExercises = (
   const average = sum / hours.length;
   const trainingDays = hours.filter((hour) => hour != 0).length;
   const ratio = average / target;
-  let rating: number = 0;
+  let rating: number;
 
   if (ratio < 1) rating = 1;
   else if (ratio === 1) rating = 2;
-  else if (ratio > 1) rating = 3;
+  else rating = 3;
 
   const ratingDescription = [
     "❌  You didn't succeed to cope your objectives... ",
@@ -34,7 +34,7 @@ const calculateExercises = (
     "⭐️ Awesome, you worked mor than your goal !",
   ];
 
-  const result: calculateResult = {
+  const result: CalculateResult = {
     periodLength: hours.length,
     trainingDays,
     success: average >= target,
@@ -46,9 +46,13 @@ const calculateExercises = (
   return result;
 };
 
-const target: number = Number(process.argv[2]);
-const hours: number[] = process.argv.slice(3).map((strHour) => Number(strHour));
+if (process.argv[1] === "exerciseCalculator.ts") {
+  const target = Number(process.argv[2]);
+  const hours: number[] = process.argv
+    .slice(3)
+    .map((strHour) => Number(strHour));
 
-const response = calculateExercises(hours, target);
+  const response = calculateExercises(hours, target);
 
-console.log(response);
+  console.log(response);
+}

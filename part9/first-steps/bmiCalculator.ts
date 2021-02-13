@@ -13,7 +13,9 @@ export const calculateBmi = (height: number, weight: number): string => {
   else return "Obese Class III (Very severely obese)";
 };
 
-const h: number = Number(process.argv[2]);
-const w: number = Number(process.argv[3]);
+if (process.argv[1] === "bmiCalculator.ts") {
+  const h = Number(process.argv[2]);
+  const w = Number(process.argv[3]);
 
-console.log(calculateBmi(h, w));
+  console.log(calculateBmi(h, w));
+}
