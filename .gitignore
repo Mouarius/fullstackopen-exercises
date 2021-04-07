@@ -1,2 +1,9 @@
 node_modules
 .env
+*/**/.DS_Store
+
+*/**/.eslintcache
+
+*/**/db.json
+
+.DS_Store
